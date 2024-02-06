@@ -1,6 +1,6 @@
 From programming to providing legal and health advice, large language models (LLMs) are revolutionizing the landscape of human lives. 
 
-<p align="center"><img src="clm_objective.png" alt="autoregressive" width="350"></p>
+<p align="center"><img src="clm_objective.png" alt="autoregressive" width="250"></p>
 <p align="center">Figure 1: illustration of conventional AR decoding: one token is generated at a time.</p>
 In the following section, we'll introduce consistency large language models (CLLMs), a new family models developed with our proposed techniques to reduce inference latency with Jacobi decoding.
 
