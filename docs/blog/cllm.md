@@ -10,11 +10,17 @@ Jacobi decoding is first introduced by [this paper](https://arxiv.org/abs/2305.1
 <p align="center"><img src="jacobi_objective.png" alt="autoregressive" width="350"></p>
 <p align="center">Figure 2: illustration of Jacobi decoding: n-token sequence is fed into the LLM and iterates until convergence.</p>
 
-#### Limitations of Vanilla Jacobi Decoding
+### Jacobi Trajectory
+
+### Limitations of Vanilla Jacobi Decoding
 
 ## Consistency LLMs (CLLMs)
 
 ##  Experiments
+
+### Fast Forwarding and Stationary Tokens
+
+### Results
 
 
 ## Final words
