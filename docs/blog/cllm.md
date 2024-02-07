@@ -107,7 +107,17 @@ $$
 
 ### Results
 
+Our experiments contains a three domain-specific tasks, including text-to-SQL (Spider), Python code generation (Code-search-Python) and graduate school math (GSM8k), and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
+
+
+
+
+
 ### Fast Forwarding and Stationary Tokens
+
+
+
+
 
 ## Final words
 We invite you to refer to the [our paper](TODO) for more details! Please stay tuned for code and CLLM checkpoint release!
@@ -122,3 +132,7 @@ We invite you to refer to the [our paper](TODO) for more details! Please stay tu
 [4] Song, Yang, et al. "Score-based generative modeling through stochastic differential equations." arXiv preprint arXiv:2011.13456 (2020).
 
 [5] Agarwal, Rishabh, et al. "GKD: Generalized Knowledge Distillation for Auto-regressive Sequence Models." arXiv preprint arXiv:2306.13649 (2023).
+
+[6] Bi, Xiao, et al. "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism." arXiv preprint arXiv:2401.02954 (2024).
+
+[7] Touvron, Hugo, et al. "Llama 2: Open foundation and fine-tuned chat models, 2023." URL https://arxiv. org/abs/2307.09288 (2023).
