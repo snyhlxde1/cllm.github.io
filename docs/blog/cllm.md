@@ -73,7 +73,7 @@ We can encourage push CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input
 
 $$
 \begin{align}
-   \mathcal L_{\text{GC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, \mathbf y \sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D(q_{\theta}(\cdot|\mathbf y_{:i}, \mathbf x)|| q_{\theta}(\cdot|\mathbf y_{:i}^{*}, \mathbf x)) \Big] 
+   \mathcal L_{\text{GC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, \mathbf y \sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D( q_{\theta}(\cdot|\mathbf y_{:i}^{*}, \mathbf x))  || q_{\theta}(\cdot|\mathbf y_{:i}, \mathbf x)\Big] 
 \end{align}
 $$
 
@@ -83,7 +83,7 @@ Alternatively, local consistency (LC) loss following the formulation in [3], whe
 
 $$
 \begin{align}
-   \mathcal L_{\text{LC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, (\mathbf y^{(j)}, \mathbf y^{(j+1)} )\sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D(q_{\theta}(\cdot|\mathbf y_{:i}^{(j)}, \mathbf x)|| q_{\theta}(\cdot|\mathbf y_{:i}^{(j+1)}, \mathbf x)) \Big] 
+   \mathcal L_{\text{LC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, (\mathbf y^{(j)}, \mathbf y^{(j+1)} )\sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D( q_{\theta}(\cdot|\mathbf y_{:i}^{(j+1)}, \mathbf x)) || q_{\theta}(\cdot|\mathbf y_{:i}^{(j)}, \mathbf x) \Big] 
 \end{align}
 $$
 
