@@ -23,7 +23,7 @@ speficied otherwise) from an input prompt. The n-token sequence, along with the 
 
 ### Limitations of Jacobi Decoding
 
-However, vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated in Figure 3.
+Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 3.
 
 ## Consistency LLMs (CLLMs)
 
@@ -52,9 +52,16 @@ y_{n}^{(j+1)} &= \underset{y}{\text{arg max}} \ \ p(y | \\mathbf y_{:n}^{(j)}, \
 \end{align}
 $$
 
-Note that The iteration exits at some k such that $\mathbf y^{(k)} = \mathbf y^{(k−1)}$ and we define $\mathbf y^{∗} := \mathbf y^{(k)}$ as the fixed point, and $\mathcal J := \set{  \mathbf y^{(1)}, \dots, \mathbf y^{(k)} }$ as the Jacobi trajectory.
+Note that The iteration exits at some k such that $\mathbf y^{(k)} = \mathbf y^{(k−1)}$ and we define $\mathbf y^{∗} := \mathbf y^{(k)}$ as the fixed point, and $\mathcal J := \set{  \mathbf y^{(1)}, \dots, \mathbf y^{(k)} }$ as the Jacobi trajectory. 
 
 ### Training with Jacobian Trajectories
+
+To address this, we propose adapting pre-trained LLMs so that they can consistently mapp any point $\mathbf y$ on the Jacobi trajectory $\mathcal{J}$ to the fixed point $\mathbf y^*$. Surprisingly, we find such an objective is analogous to that of [consistency models](https://arxiv.org/abs/2303.01469), a leading acceleration approach for diffusion models [3, 4]. In our proposed method, we use Jacobi trajectories collected from a target model to train the model with a loss that encourages single-step convergence during Jacobi iterations. For each target model $p$ to be adapted as a CLLM, the training consists of two parts:
+
+- **Jacobi trajectory preparation:** for each prompt, we sequentially perform Jacobi decoding for every truncation of $n$ tokens until the entire response sequence $\mathbf \ell$ has been generated, which amounts to a concatenation of all consecutive fixed points. Note that for a lengthy response $\ell$ of $N$ ($N ≫ n$) tokens, this approach avoids slow model evaluation on lengthy input. 
+
+
+- **Training with consistency and AR loss:** we jointly optimize two losses for tuning CLLMs, the consistency loss guarantees the prediction of multiple tokens at once and the AR loss prevents the CLLM from deviating from the target LLM so as to maintain generation quality.
 
 ### Consistency and AR Loss
 
@@ -67,3 +74,12 @@ Note that The iteration exits at some k such that $\mathbf y^{(k)} = \mathbf y^{
 
 ## Final words
 We invite you to refer to the [our paper](TODO) for more details! Please stay tuned for code and CLLM checkpoint release!
+
+## References
+[1] Song, Yang, et al. "Accelerating feedforward computation via parallel nonlinear equation solving." International Conference on Machine Learning. PMLR, 2021.
+
+[2] Santilli, Andrea, et al. "Accelerating Transformer Inference for Translation via Parallel Decoding." arXiv preprint arXiv:2305.10427 (2023).
+
+[3] Song, Yang, and Prafulla Dhariwal. "Improved techniques for training consistency models." arXiv preprint arXiv:2310.14189 (2023).
+
+[4] Song, Yang, et al. "Score-based generative modeling through stochastic differential equations." arXiv preprint arXiv:2011.13456 (2020).
