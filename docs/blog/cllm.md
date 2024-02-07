@@ -18,7 +18,7 @@ Large language models (LLMs) are transforming the landscape of human lives, From
 
 ### Jacobi Trajectory
 
-### Limitations of Vanilla Jacobi Decoding
+### Limitations of Jacobi Decoding
 
 ## Consistency LLMs (CLLMs)
 
