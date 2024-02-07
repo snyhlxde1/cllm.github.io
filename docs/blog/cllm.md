@@ -27,12 +27,43 @@ However, vanilla Jacobi decoding for LLMs shows only marginal speedup over AR de
 
 ## Consistency LLMs (CLLMs)
 
-##  Experiments
+### Jacobi Decoding Preliminary
 
-### Fast Forwarding and Stationary Tokens
+Given a prompt $\mathbf x$ and a pre-trained LLM $p(\cdot| \mathbf x)$, we obtain the model generation typically with the standard AR decoding method under the greedy strategy, i.e.
+
+$$
+\begin{align}
+y_i = \underset{y}{\text{arg max }} p(y | \mathbf {y}_{:i}, \mathbf x) \ \ \text{for}\,\, i = 1,\dots,n
+\end{align}
+$$
+
+Jacobi decoding re-frames the LLM inference process as solving a system of nonlinear equations to transform the decoding process into a parallelizable computation. Consider, $f(y_i, \mathbf y_{:i}, \mathbf x):= y_i- \underset{y}{\text{arg max }} p(y | \mathbf y_{:i}, \mathbf x)$, we can rewrite the above equation as a system of nonlinear equations:
+
+$$
+\begin{align}
+f(y_i, \mathbf y_{:i}, \mathbf x) = 0 \ \ \text{for}\,\, i = 1,\dots,n 
+\Longrightarrow 
+\begin{cases}
+y_{1}^{(j+1)} &= \underset{y}{\text{arg max}} \ \ p(y | \mathbf x) \\
+y_{2}^{(j+1)} &= \underset{y}{\text{arg max}} \ \ p(y | \\mathbf y_{1}^{(j)}, \mathbf x) \\
+& \vdots \\
+y_{n}^{(j+1)} &= \underset{y}{\text{arg max}} \ \ p(y | \\mathbf y_{:n}^{(j)}, \mathbf x)
+\end{cases}
+\end{align}
+$$
+
+Note that The iteration exits at some k such that $\mathbf y^{(k)} = \mathbf y^{(k−1)}$ and we define $\mathbf y^{∗} := \mathbf y^{(k)}$ as the fixed point, and $\mathcal J := \set{  \mathbf y^{(1)}, \dots, \mathbf y^{(k)} }$ as the Jacobi trajectory.
+
+### Training with Jacobian Trajectories
+
+### Consistency and AR Loss
+
+
+##  Experiments
 
 ### Results
 
+### Fast Forwarding and Stationary Tokens
 
 ## Final words
 We invite you to refer to the [our paper](TODO) for more details! Please stay tuned for code and CLLM checkpoint release!
