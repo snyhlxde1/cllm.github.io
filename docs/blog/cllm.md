@@ -58,13 +58,50 @@ Note that The iteration exits at some k such that $\mathbf y^{(k)} = \mathbf y^{
 
 To address this, we propose adapting pre-trained LLMs so that they can consistently mapp any point $\mathbf y$ on the Jacobi trajectory $\mathcal{J}$ to the fixed point $\mathbf y^*$. Surprisingly, we find such an objective is analogous to that of [consistency models](https://arxiv.org/abs/2303.01469), a leading acceleration approach for diffusion models [3, 4]. In our proposed method, we use Jacobi trajectories collected from a target model to train the model with a loss that encourages single-step convergence during Jacobi iterations. For each target model $p$ to be adapted as a CLLM, the training consists of two parts:
 
-- **Jacobi trajectory preparation:** for each prompt, we sequentially perform Jacobi decoding for every truncation of $n$ tokens until the entire response sequence $\mathbf \ell$ has been generated, which amounts to a concatenation of all consecutive fixed points. Note that for a lengthy response $\ell$ of $N$ ($N ≫ n$) tokens, this approach avoids slow model evaluation on lengthy input. 
+- **Jacobi trajectory preparation:** for each prompt, we sequentially perform Jacobi decoding for every truncation of $n$ tokens until the entire response sequence $\mathbf l$ has been generated, which amounts to a concatenation of all consecutive fixed points. Each sequence generated along a trajectory counts as a data entry. Note that for a lengthy response $\mathbf l$ of $N$ ($N ≫ n$) tokens, such truncation avoids slow model evaluation on lengthy input.
 
 
 - **Training with consistency and AR loss:** we jointly optimize two losses for tuning CLLMs, the consistency loss guarantees the prediction of multiple tokens at once and the AR loss prevents the CLLM from deviating from the target LLM so as to maintain generation quality.
 
 ### Consistency and AR Loss
 
+#### Consistency Loss
+
+Let $p$ denote the target LLM we aim to adapt. Let $q_\theta(\cdot| \mathbf x)$ denote the CLLM with parameters $\theta$ initialized with those of $p$. For a prompt $\mathbf x$ with the Jacobi trajectory $\mathcal{J}$, let $\mathbf y$ and $\mathbf y^*$ denote a random state on the trajectory and the fixed point respectively. 
+
+We can encourage push CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input by minimizing the following loss, termed as the global consistency (GS) loss:
+
+$$
+\begin{align}
+   \mathcal L_{\text{GC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, \mathbf y \sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D(q_{\theta}(\cdot|\mathbf y_{:i}, \mathbf x)|| q_{\theta}(\cdot|\mathbf y_{:i}^{*}, \mathbf x)) \Big] 
+\end{align}
+$$
+
+where we abuse notations to represent uniform sampling from the dataset.  $D(\cdot||\cdot)$ denotes the distance between two distributions, choices are discussed in [[5]](https://arxiv.org/abs/2306.13649) and in this paper we primarily experiment with the forward KL. 
+
+Alternatively, local consistency (LC) loss following the formulation in [3], where the adjacent states $(\mathbf y^{(j)}, \mathbf y^{(j+1)}$ in a Jacobi trajectory $\mathcal{J}$ are driven to yield the same outputs:
+
+$$
+\begin{align}
+   \mathcal L_{\text{LC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, (\mathbf y^{(j)}, \mathbf y^{(j+1)} )\sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D(q_{\theta}(\cdot|\mathbf y_{:i}^{(j)}, \mathbf x)|| q_{\theta}(\cdot|\mathbf y_{:i}^{(j+1)}, \mathbf x)) \Big] 
+\end{align}
+$$
+
+#### AR Loss
+
+To avoid deviating from the distribution of the target LLM, we incorporate the traditional AR loss based on the generation $\mathbf l$ of the target LLM $p$:
+
+$$
+\begin{align}
+    \mathcal L_{\text{AR}} = \underset{ (\mathbf x, \mathbf l) \sim \mathcal D }{\mathbb E} \Big[ - \sum_{i=1}^N \log q_{\theta}(l_i | \mathbf l_{:i}, \mathbf x) \Big]
+\end{align}
+$$
+
+Putting the two loss together, with some weight $w$, the total loss for training a CLLM is:
+
+$$
+\mathcal{L}(\theta) = \mathcal L_{\text{consistency}} + w\mathcal{L}_{\text{AR}}
+$$
 
 ##  Experiments
 
@@ -83,3 +120,5 @@ We invite you to refer to the [our paper](TODO) for more details! Please stay tu
 [3] Song, Yang, and Prafulla Dhariwal. "Improved techniques for training consistency models." arXiv preprint arXiv:2310.14189 (2023).
 
 [4] Song, Yang, et al. "Score-based generative modeling through stochastic differential equations." arXiv preprint arXiv:2011.13456 (2020).
+
+[5] Agarwal, Rishabh, et al. "GKD: Generalized Knowledge Distillation for Auto-regressive Sequence Models." arXiv preprint arXiv:2306.13649 (2023).
