@@ -112,7 +112,8 @@ $$
 
 Our experiments contains a three domain-specific tasks, including Spider (text-to-SQL), Human-Eval (Python code completion) and GSM8k (math), and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
 
-
+<p align="center"><img src="speedup.png" alt="speedup" width="500"></p>
+<p align="center">Figure 5: CLLM speedup on different downstream tasks.</p>
 
 <p align="center"><img src="specialized_domains.png" alt="specialized" width="400"> <img src="mt-bench.png" alt="mt-bench" width="400"></p>
 <p align="center">Figure 5: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k), as well as on MT-bench. Note that the dot size is in proportion to memory consumption.</p>
