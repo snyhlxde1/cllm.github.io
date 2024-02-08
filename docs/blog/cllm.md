@@ -136,7 +136,7 @@ We observe that CLLMs acquire a crucial linguistic concept through training – 
 
 
 ## Final words
-We invite you to refer to check out [our paper](TODO) for more details! Please stay tuned for code and CLLM checkpoint release!
+We invite you to check out [our paper](TODO) for more details! Please stay tuned for code and CLLM checkpoint release!
 
 ## References
 [1] Song, Yang, et al. "Accelerating feedforward computation via parallel nonlinear equation solving." International Conference on Machine Learning. PMLR, 2021.
