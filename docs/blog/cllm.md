@@ -123,7 +123,7 @@ Our experiments contains three domain-specific tasks, including Spider (text-to-
 
 ### Fast Forwarding and Stationary Tokens
 
-<p align="center"><img src="trajectory_compare.png" alt="compare_trajectory" width="900"></p>
+<p align="center"><img src="trajectory_compare_aligned.png" alt="compare_trajectory" width="950"></p>
 <p align="center">Figure 6: Comparison of Jacobi trajectory between a target LLM and CLLMs on Spider. Each point along the Jacobi trajectory is a color-coded sequence: blue for correct tokens matching with AR results, and red for inaccurate ones. CLLM demonstrates enhanced efficiency, converging to the fixed point $2\times$ faster the Target LLM. This increased efficiency in the CLLM can be attributed to the consistency loss which facilitates the learning of the strcture of each $n$-token sequence given a prefix.</p>
 
 The left side of Figure 6 shows target LLMs typically generate only one correct token in one iteration. In contrast, in CLLMs, we identify **fast forwarding phenomenon** where multiple consecutive tokens are correctly predicted in a single Jacobi iteration. 
