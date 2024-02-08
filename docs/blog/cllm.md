@@ -8,12 +8,12 @@
 
 Large language models (LLMs) are transforming the landscape of human lives, From programming to offering legal and health advice. However, during inference, LLMs generate responses token by token using AR decoding as shown in Figure 1, leading to high latency for longer responses. Using AR decoding, it often necessiate architectural modifications, auxiliary components, or draft models, to speedup inference by generating more than one token at a time. 
 
-<p align="center"><img src="clm_objective.png" alt="autoregressive" width="250"></p>
+<p align="center"><img src="clm_objective.png" alt="autoregressive" width="300"></p>
 <p align="center">Figure 1: illustration of conventional AR decoding: one token is generated at a time.</p>
 
 [Jacobi decoding](https://arxiv.org/abs/2305.10427) originiates from the Jacobi and Gauss-Seidel fixed-point iteration for solving nonlinear equations, and is proven to be identical to AR generation using greedy decoding [[1]](https://proceedings.mlr.press/v139/song21a.html). reformulates the sequential generation process into a problem of solving a system of $n$ non-linear equations with $n$ variables. However, Jacobi decoding seldom accurately predicts more than one token in a single fixed-point iteration step.
 
-<p align="center"><img src="jacobi_objective.png" alt="jacobi" width="350"></p>
+<p align="center"><img src="jacobi_objective.png" alt="jacobi" width="425"></p>
 <p align="center">Figure 2: illustration of Jacobi decoding: n-token sequence is fed into the LLM and iterates until convergence.</p>
 
 ### Jacobi Trajectory
