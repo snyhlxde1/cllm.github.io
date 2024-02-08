@@ -23,7 +23,7 @@ speficied otherwise) from an input prompt. The n-token sequence, along with the 
 
 ### Limitations of Jacobi Decoding
 
-Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 5.
+Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 6.
 
 ## Consistency LLMs (CLLMs)
 
@@ -122,6 +122,9 @@ Our experiments contains a three domain-specific tasks, including Spider, CodeSe
 ### Fast Forwarding and Stationary Tokens
 
 
+
+<p align="center"><img src="trajectory_compare.png" alt="compare_trajectory" width="250"></p>
+<p align="center">Figure 6: Comparison of Jacobi trajectory between a target LLM and CLLMs on Spider. Each point along the Jacobi trajectory is a color-coded sequence: blue for correct tokens matching with AR results, and red for inaccurate ones. CLLM demonstrates enhanced efficiency, converging to the fixed point $2\times$ faster the Target LLM. This increased efficiency in the CLLM can be attributed to the consistency loss which facilitates the learning of the strcture of each $n$-token sequence given a prefix.</p>
 
 
 
