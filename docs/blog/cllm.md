@@ -13,7 +13,7 @@ Large language models (LLMs) are transforming the landscape of human lives, From
 
 [Jacobi decoding](https://arxiv.org/abs/2305.10427) originiates from the Jacobi and Gauss-Seidel fixed-point iteration for solving nonlinear equations, and is proven to be identical to AR generation using greedy decoding [[1]](https://proceedings.mlr.press/v139/song21a.html). reformulates the sequential generation process into a problem of solving a system of $n$ non-linear equations with $n$ variables. However, Jacobi decoding seldom accurately predicts more than one token in a single fixed-point iteration step.
 
-<p align="center"><img src="jacobi_objective.png" alt="autoregressive" width="350"></p>
+<p align="center"><img src="jacobi_objective.png" alt="jacobi" width="350"></p>
 <p align="center">Figure 2: illustration of Jacobi decoding: n-token sequence is fed into the LLM and iterates until convergence.</p>
 
 ### Jacobi Trajectory
@@ -23,7 +23,7 @@ speficied otherwise) from an input prompt. The n-token sequence, along with the 
 
 ### Limitations of Jacobi Decoding
 
-Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 3.
+Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 6.
 
 ## Consistency LLMs (CLLMs)
 
@@ -107,9 +107,14 @@ $$
 
 ### Results
 
-Our experiments contains a three domain-specific tasks, including text-to-SQL (Spider), Python code generation (Code-search-Python) and graduate school math (GSM8k), and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
+Our experiments contains a three domain-specific tasks, including Spider, CodeSearchNet-Python and GSM8k, and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
+
+<p align="center"><img src="specialized_domain.png" alt="specialized" width="250"></p>
+<p align="center">Figure 4: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k).</p>
 
 
+<p align="center"><img src="mt-bench.png" alt="mt-bench" width="250"></p>
+<p align="center">Figure 5: illustration of CLLM vs. other baselines on MT-bench.</p>
 
 
 
