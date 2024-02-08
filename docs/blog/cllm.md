@@ -76,7 +76,7 @@ We can encourage push CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input
 
 $$
 \begin{align}
-   \mathcal L_{\text{GC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, \mathbf y \sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D( q_{\theta}(\cdot|\mathbf y_{:i}^{*}, \mathbf x))  || q_{\theta}(\cdot|\mathbf y_{:i}, \mathbf x)\Big] 
+   \mathcal L_{\text{GC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, \mathbf y \sim \mathcal{J}}{\mathbb E} \Big[ \sum_{i=1}^n  D( q_{\theta}(\cdot|\mathbf y_{:i}^{*}, \mathbf x))  || q_{\theta}(\cdot|\mathbf y_{:i}, \mathbf x)\Big] 
 \end{align}
 $$
 
@@ -86,7 +86,7 @@ Alternatively, local consistency (LC) loss following the formulation in [3], whe
 
 $$
 \begin{align}
-   \mathcal L_{\text{LC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, (\mathbf y^{(j)}, \mathbf y^{(j+1)} )\sim \mathcal{J}}{\mathbb E} \sum_{i=1}^n \Big[ D( q_{\theta}(\cdot|\mathbf y_{:i}^{(j+1)}, \mathbf x)) || q_{\theta}(\cdot|\mathbf y_{:i}^{(j)}, \mathbf x) \Big] 
+   \mathcal L_{\text{LC}} =\underset{(\mathbf x, \mathcal{J}) \sim \mathcal{D}, (\mathbf y^{(j)}, \mathbf y^{(j+1)} )\sim \mathcal{J}}{\mathbb E} \Big[ \sum_{i=1}^n  D( q_{\theta}(\cdot|\mathbf y_{:i}^{(j+1)}, \mathbf x)) || q_{\theta}(\cdot|\mathbf y_{:i}^{(j)}, \mathbf x) \Big] 
 \end{align}
 $$
 
@@ -110,21 +110,27 @@ $$
 
 ### Results
 
-Our experiments contains a three domain-specific tasks, including Spider, CodeSearchNet-Python and GSM8k, and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
+Our experiments contains a three domain-specific tasks, including Spider (text-to-SQL), Human-Eval (Python code completion) and GSM8k (math), and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
+
+
 
 <p align="center"><img src="specialized_domains.png" alt="specialized" width="400"> <img src="mt-bench.png" alt="mt-bench" width="400"></p>
-<p align="center">Figure 4: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k), as well as on MT-bench. Note that the dot size is in proportion to memory consumption.</p>
+<p align="center">Figure 5: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k), as well as on MT-bench. Note that the dot size is in proportion to memory consumption.</p>
 
-**Specialized domains:** From Figure 4, we can see that in comparison with other baselines including the original target model, Medusa2, and speculative decoding, CLLMs achieve the most significant speedup.
+**Specialized domains:** From Figure 5, we can see that in comparison with other baselines including the original target model, Medusa2, and speculative decoding, CLLMs achieve the most significant speedup.
 
-**Open-domain conversatinoal Challenge (MT-bench):** CLLM trained from LLaMA2-7B using ShareGPT dataset can achieve roughly the same speedup as Medusa2, with comparable scores on MT-bench. However, CLLM offers higher adaptability and memory efficiency as it requires no modifications to the target model's original architecture and no auxiliary components.
+**Open-domain conversatinoal Challenge (MT-bench):** CLLM trained from LLaMA2-7B using ShareGPT dataset can achieve roughly the same speedup as Medusa2 when combined with lookahead decoding, with comparable scores on MT-bench. However, CLLM offers higher adaptability and memory efficiency as it requires no modifications to the target model's original architecture and no auxiliary components.
 
 ### Fast Forwarding and Stationary Tokens
 
-
-
-<p align="center"><img src="trajectory_compare.png" alt="compare_trajectory" width="250"></p>
+<p align="center"><img src="trajectory_compare.png" alt="compare_trajectory" width="900"></p>
 <p align="center">Figure 6: Comparison of Jacobi trajectory between a target LLM and CLLMs on Spider. Each point along the Jacobi trajectory is a color-coded sequence: blue for correct tokens matching with AR results, and red for inaccurate ones. CLLM demonstrates enhanced efficiency, converging to the fixed point $2\times$ faster the Target LLM. This increased efficiency in the CLLM can be attributed to the consistency loss which facilitates the learning of the strcture of each $n$-token sequence given a prefix.</p>
+
+The left side of Figure 6 shows target LLMs typically generate only one correct token in one iteration. In contrast, in CLLMs, we identify **fast forwarding phenomenon** where multiple consecutive tokens are correctly predicted in a single Jacobi iteration. 
+
+Moreover, tokens correctly generated in advance (e.g. “country” and “H” at index 6 and 7 on the left side of Figure 6), are often replaced inaccurately in subsequent iterations in target LLMs. On the other hand, CLLMs exhibit the capability of predicting correct tokens preemptively, even with preceding incorrect tokens, while ensuring the tokens remain unchanged. We term such tokens as **stationary tokens**. Both phenomena contribute to the fast convergence in Jacobi decoding of CLLMs, thereby leading to a considerable generation speedup.
+
+We observe that CLLMs acquire a crucial linguistic concept through training – **collocations**: a series of words or terms that co-occur more frequently than one would expect by random chance [[8]](https://aclanthology.org/P91-1036.pdf). Language is not solely composed of isolated words but also relies heavily on specific word pairings. Examples of collocations are abundant in both natural and coding languages. They include verb + preposition combinations (e.g., ''talk to'', ''remind ... of ...''), verb + noun structures (e.g., ''make a decision'', ''catch a cold''), and many more domain-specific syntactical structures (e.g., ''SELECT ... FROM ...'', ''if ... else'' for programming). The consistency generation objective allows CLLMs to infer such structures from any point in the Jacobi trajectory, encouraging CLLMs to acquire proficiency in numerous collocations and thereby predict multiple words simultaneously to minimize iteration steps. 
 
 
 
@@ -145,3 +151,5 @@ We invite you to refer to the [our paper](TODO) for more details! Please stay tu
 [6] Bi, Xiao, et al. "DeepSeek LLM: Scaling Open-Source Language Models with Longtermism." arXiv preprint arXiv:2401.02954 (2024).
 
 [7] Touvron, Hugo, et al. "Llama 2: Open foundation and fine-tuned chat models, 2023." URL https://arxiv. org/abs/2307.09288 (2023).
+
+[8] Smadja, Frank. "From n-grams to collocations: An evaluation of Xtract." 29th Annual Meeting of the Association for Computational Linguistics. 1991.
