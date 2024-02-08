@@ -113,9 +113,11 @@ $$
 Our experiments contains a three domain-specific tasks, including Spider, CodeSearchNet-Python and GSM8k, and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
 
 <p align="center"><img src="specialized_domains.png" alt="specialized" width="400"> <img src="mt-bench.png" alt="mt-bench" width="400"></p>
-<p align="center">Figure 4: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k), as well as on MT-bench.</p>
+<p align="center">Figure 4: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k), as well as on MT-bench. Note that the dot size is in proportion to memory consumption.</p>
 
-**Specialized domains:** From Figure 4, we can see that in comparison with other baselines including the original target model, Medusa, 
+**Specialized domains:** From Figure 4, we can see that in comparison with other baselines including the original target model, Medusa2, and speculative decoding, CLLMs achieve the most significant speedup.
+
+**Open-domain conversatinoal Challenge (MT-bench):** CLLM trained from LLaMA2-7B using ShareGPT dataset can achieve roughly the same speedup as Medusa2, with comparable scores on MT-bench. However, CLLM offers higher adaptability and memory efficiency as it requires no modifications to the target model's original architecture and no auxiliary components.
 
 ### Fast Forwarding and Stationary Tokens
 
