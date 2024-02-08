@@ -23,7 +23,7 @@ speficied otherwise) from an input prompt. The n-token sequence, along with the 
 
 ### Limitations of Jacobi Decoding
 
-Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 6.
+Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 5.
 
 ## Consistency LLMs (CLLMs)
 
@@ -62,6 +62,9 @@ To address this, we propose adapting pre-trained LLMs so that they can consisten
 
 
 - **Training with consistency and AR loss:** we jointly optimize two losses for tuning CLLMs, the consistency loss guarantees the prediction of multiple tokens at once and the AR loss prevents the CLLM from deviating from the target LLM so as to maintain generation quality.
+
+<p align="center"><img src="objective.png" alt="objective_gif" width="250"></p>
+<p align="center">Figure 3: illustration of CLLM learning objective.</p>
 
 ### Consistency and AR Loss
 
@@ -109,14 +112,10 @@ $$
 
 Our experiments contains a three domain-specific tasks, including Spider, CodeSearchNet-Python and GSM8k, and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
 
-<p align="center"><img src="specialized_domain.png" alt="specialized" width="250"></p>
-<p align="center">Figure 4: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k).</p>
+<p align="center"><img src="specialized_domains.png" alt="specialized" width="400"> <img src="mt-bench.png" alt="mt-bench" width="400"></p>
+<p align="center">Figure 4: illustration of CLLM vs. other baselines on domain-specific tasks (Spider, CodeSearchNet-Python, GSM8k), as well as on MT-bench.</p>
 
-
-<p align="center"><img src="mt-bench.png" alt="mt-bench" width="250"></p>
-<p align="center">Figure 5: illustration of CLLM vs. other baselines on MT-bench.</p>
-
-
+**Specialized domains:** From Figure 4, we can see that in comparison with other baselines including the original target model, Medusa, 
 
 ### Fast Forwarding and Stationary Tokens
 
