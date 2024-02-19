@@ -60,8 +60,8 @@ To address this, we propose adapting pre-trained LLMs so that they can consisten
 
 - **Training with consistency and AR loss:** we jointly optimize two losses for tuning CLLMs, the consistency loss guarantees the prediction of multiple tokens at once and the AR loss prevents the CLLM from deviating from the target LLM so as to maintain generation quality.
 
-<p align="center"><img src="cllm_objective.gif" alt="objective_gif" width="700"></p>
-<p align="center">Figure 3: an animation of Jacobi decoding, and the CLLM training objective for one-step convergence.</p>
+<p align="center"><img src="training_objective.png" alt="objective_gif" width="700"></p>
+<p align="center">Figure 3: an illustration of consistency training for one-step convergence: refining the target LLM to consistently predict the fixed point given any state along Jacobi trajectory as input.</p>
 
 ### Consistency and AR Loss
 
@@ -69,7 +69,7 @@ To address this, we propose adapting pre-trained LLMs so that they can consisten
 
 Let $p$ denote the target LLM. Let $q_\theta(\cdot| \mathbf x)$ denote the CLLM with parameters $\theta$ initialized with those of $p$. For a prompt $\mathbf x$ and the corresponding Jacobi trajectory $\mathcal{J}$, let $\mathbf y$ and $\mathbf y^*$ denote a random state and the fixed point on the trajectory respectively. 
 
-We can encourage CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input by minimizing the following loss, termed as the global consistency (GS) loss:
+We can encourage CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input by minimizing the following loss, termed as the global consistency (GC) loss:
 
 $$
 \begin{align}
