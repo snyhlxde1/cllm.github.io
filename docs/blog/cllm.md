@@ -11,7 +11,8 @@ Large language models (LLMs) are transforming the landscape of human lives, from
 <p align="center"><img src="clm_objective.png" alt="autoregressive" width="300"></p>
 <p align="center">Figure 1: illustration of conventional AR decoding: one token is generated at a time.</p>
 
-[Jacobi decoding](https://arxiv.org/abs/2305.10427) originates from the Jacobi and Gauss-Seidel fixed-point iteration for solving nonlinear equations, and is proven identical to AR generation using greedy decoding [[1]](https://proceedings.mlr.press/v139/song21a.html). Jacobi decoding reformulates the sequential generation process into a system of $n$ non-linear equations with $n$ variables solvable in parallel based on Jacobi iteration. Each iteration step might predict more than one correct token (By correctness, we mean alignment with the AR generation), thereby accelerating AR decoding potentially. 
+[Jacobi decoding](https://arxiv.org/abs/2305.10427) originates from the Jacobi and Gauss-Seidel fixed-point iteration for solving nonlinear equations, and is proven identical to AR generation using greedy decoding [[1]](https://proceedings.mlr.press/v139/song21a.html). Jacobi decoding reformulates the sequential generation process into a system of $n$ non-linear equations with $n$ variables solvable in parallel based on Jacobi iteration. Each iteration step might predict more than one correct token (By correctness, we mean alignment with the AR decoding
+result under a greedy sampling strategy), thereby accelerating AR decoding potentially. 
 
 <p align="center"><img src="jacobi_objective.png" alt="jacobi" width="425"></p>
 <p align="center">Figure 2: illustration of Jacobi decoding: $n$-token sequence is fed into the LLM and iterates until convergence.</p>
