@@ -1,28 +1,26 @@
 # Accelerate LLM Inference with CLLMs
 
-**TL;DR:** In this article, we introduce consistency large language models (CLLMs), a new family models developed with our proposed techniques to reduce inference latency by efficiently decoding $n$ tokens in parallel. This decoding method is called [Jacobi decoding](https://arxiv.org/abs/2305.10427), which improve inference efficiency by breaking the seuqntially nature of convential auto-regressive (AR) decoding. CLLMs are trained with the objective of performing efficient Jacobi decoding by mapping any randomly initialized $n $-token sequence to a correctly predicted sequence in as few steps as possible. Experiment results show CLLMs obtained using our proposed method are highly effective, showing $1.3\times$ to $3.4\times$ improvements in generation speed while preserving generation quality in comparison with the baselines and other SOTA techniques. CLLMs also show a high adaptability and memory efficiency as they require no modifications to the existing model architecture and auxiliary model components.
+**TL;DR:** In this blog, we introduce consistency large language models (CLLMs), a new family of models developed with our proposed techniques to reduce inference latency by efficiently decoding $n$ tokens in parallel. This decoding method is called [Jacobi decoding](https://arxiv.org/abs/2305.10427), which improves inference efficiency by breaking the sequential nature of conventional auto-regressive (AR) decoding. CLLMs are trained with the objective of performing efficient Jacobi decoding by mapping any randomly initialized $n $-token sequence to a correctly predicted sequence in as few steps as possible. Experiment results show CLLMs obtained using our proposed method are highly effective, showing $2.4\times$ to $3.4\times$ improvements in generation speed while preserving generation quality in comparison with the baselines and other SOTA techniques. CLLMs also show high adaptability and memory efficiency as they require no modifications to the existing model architecture and auxiliary model components.
 
 
 
 ## Background: Jacobi Decoding
 
-Large language models (LLMs) are transforming the landscape of human lives, From programming to offering legal and health advice. However, during inference, LLMs generate responses token by token using AR decoding as shown in Figure 1, leading to high latency for longer responses. Using AR decoding, it often necessiate architectural modifications, auxiliary components, or draft models, to speedup inference by generating more than one token at a time. 
+Large language models (LLMs) are transforming the landscape of human lives, from programming to offering legal and health advice. However, during inference, LLMs generate responses token by token using AR decoding as shown in Figure 1, leading to high latency for longer responses. Using AR decoding, it often necessitates architectural modifications, auxiliary components, or draft models, to speed up inference by generating more than one token at a time. 
 
 <p align="center"><img src="clm_objective.png" alt="autoregressive" width="300"></p>
 <p align="center">Figure 1: illustration of conventional AR decoding: one token is generated at a time.</p>
 
-[Jacobi decoding](https://arxiv.org/abs/2305.10427) originiates from the Jacobi and Gauss-Seidel fixed-point iteration for solving nonlinear equations, and is proven identical to AR generation using greedy decoding [[1]](https://proceedings.mlr.press/v139/song21a.html). Jacobi decoding reformulates the sequential generation process into a problem of solving a system of $n$ non-linear equations with $n$ variables. However, Jacobi decoding seldom accurately predicts more than one token in a single fixed-point iteration step.
+[Jacobi decoding](https://arxiv.org/abs/2305.10427) originates from the Jacobi and Gauss-Seidel fixed-point iteration for solving nonlinear equations, and is proven identical to AR generation using greedy decoding [[1]](https://proceedings.mlr.press/v139/song21a.html). Jacobi decoding reformulates the sequential generation process into a system of $n$ non-linear equations with $n$ variables solvable in parallel based on Jacobi iteration. Each iteration step might predict more than one correct token (By correctness, we mean alignment with the AR generation), thereby accelerating AR decoding potentially. 
 
 <p align="center"><img src="jacobi_objective.png" alt="jacobi" width="425"></p>
 <p align="center">Figure 2: illustration of Jacobi decoding: $n$-token sequence is fed into the LLM and iterates until convergence.</p>
 
-### Jacobi Trajectory
-
-The Jacobi decoding method first randomly guesses the next $n$ tokens in a sequence (referred to as $n$-token sequence hereinafter unless speficied otherwise) from an input prompt. The $n$-token sequence, along with the prompt, is then fed to the LLM to iteratively update itself. This process continues until the $n$-token sequence stabilizes and no further changes occur, reaching a fixed point. Notably, Jacobi decoding does not require more queries to the LLM than auto-regressive (AR) decoding. Eventually, the $n$-token sequence converges to the output that would be generated by AR decoding under a greedy strategy. This progression from an initial random guess to the final AR generation outcome traces what is known as a Jacobi trajectory. An instance of Jacobi decoding iteration process and instance **Jacobi trajecotry** is illustrated in Figure 2.
+To be specific, Jacobi decoding method first randomly guesses the next $n$ tokens in a sequence (referred to as $n$-token sequence hereinafter unless specified otherwise) from an input prompt. The $n$-token sequence, along with the prompt, is then fed to the LLM to iteratively update itself. This process continues until the $n$-token sequence stabilizes and no further changes occur, reaching a fixed point. Notably, Jacobi decoding requires no more queries to the LLM than auto-regressive (AR) decoding. Eventually, the $n$-token sequence converges to the output that would be generated by AR decoding under a greedy strategy. This progression from an initial random guess to the final AR generation outcome traces what is known as a Jacobi trajectory. An instance of Jacobi decoding iteration process and **Jacobi trajectory** is illustrated in Figure 2.
 
 ### Limitations of Jacobi Decoding
 
-Vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrection in its preceding tokens (By correctness, we mean alignment with the AR generation). Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 6.
+However, vanilla Jacobi decoding for LLMs shows only marginal speedup over AR decoding in practice, e.g., an average of $1.05\times$ speedup [[2]](https://arxiv.org/abs/2305.10427). This is because an AR-trained LLM can rarely yield a correct token when there are incorrections in its preceding tokens. Thereby, most Jacobi iterations gain only one correction for the $n$-token sequence, resulting in a longer trajectory as illustrated on the left side of Figure 6.
 
 ## Consistency LLMs (CLLMs)
 
@@ -40,7 +38,7 @@ Jacobi decoding re-frames the LLM inference process as solving a system of nonli
 
 $$
 \begin{align}
-f(y_i, \mathbf y_{:i}, \mathbf x) = 0 \ \ \text{for}\,\, i = 1,\dots,n 
+f(y_i, \mathbf y_{:i}, \mathbf x) = 0 \ \ \text{for} \quad i = 1,\dots,n 
 \Longrightarrow 
 \begin{cases}
 y_{1}^{(j+1)} &= \underset{y}{\text{arg max}} \ \ p(y | \mathbf x) \\
@@ -53,7 +51,7 @@ $$
 
 Note that The iteration exits at some k such that $\mathbf y^{(k)} = \mathbf y^{(k−1)}$ and we define $\mathbf y^{∗} := \mathbf y^{(k)}$ as the fixed point, and $\mathcal J := \set{  \mathbf y^{(1)}, \dots, \mathbf y^{(k)} }$ as the Jacobi trajectory. 
 
-### Training with Jacobian Trajectories
+### Training with Jacobi Trajectories
 
 To address this, we propose adapting pre-trained LLMs so that they can consistently map any point $\mathbf y$ on the Jacobi trajectory $\mathcal{J}$ to the fixed point $\mathbf y^*$. Surprisingly, we find such an objective is analogous to that of [consistency models](https://arxiv.org/abs/2303.01469), a leading acceleration approach for diffusion models [3, 4]. In our proposed method, we use Jacobi trajectories collected from a target model to train the model with a loss that encourages single-step convergence during Jacobi iterations. For each target model $p$ to be adapted as a CLLM, the training consists of two parts:
 
@@ -62,8 +60,8 @@ To address this, we propose adapting pre-trained LLMs so that they can consisten
 
 - **Training with consistency and AR loss:** we jointly optimize two losses for tuning CLLMs, the consistency loss guarantees the prediction of multiple tokens at once and the AR loss prevents the CLLM from deviating from the target LLM so as to maintain generation quality.
 
-<p align="center"><img src="cllm_objective.gif" alt="objective_gif" width="700"></p>
-<p align="center">Figure 3: an animation of Jacobi decoding, and the CLLM training objective for one-step convergence.</p>
+<p align="center"><img src="training_objective.png" alt="objective_gif" width="700"></p>
+<p align="center">Figure 3: an illustration of consistency training for one-step convergence: refining the target LLM to consistently predict the fixed point given any state along Jacobi trajectory as input.</p>
 
 ### Consistency and AR Loss
 
@@ -71,7 +69,7 @@ To address this, we propose adapting pre-trained LLMs so that they can consisten
 
 Let $p$ denote the target LLM. Let $q_\theta(\cdot| \mathbf x)$ denote the CLLM with parameters $\theta$ initialized with those of $p$. For a prompt $\mathbf x$ and the corresponding Jacobi trajectory $\mathcal{J}$, let $\mathbf y$ and $\mathbf y^*$ denote a random state and the fixed point on the trajectory respectively. 
 
-We can encourage CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input by minimizing the following loss, termed as the global consistency (GS) loss:
+We can encourage CLLM to output $\mathbf y^*$ with $\mathbf y$ as the input by minimizing the following loss, termed as the global consistency (GC) loss:
 
 $$
 \begin{align}
@@ -109,7 +107,7 @@ $$
 
 ### Results
 
-Our experiments contains three domain-specific tasks, including Spider (text-to-SQL), Human-Eval (Python code completion) and GSM8k (math), and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
+Our experiments contain three domain-specific tasks, including Spider (text-to-SQL), Human-Eval (Python code completion), and GSM8k (math), and the broader open-domain conversational challenge, MT-bench. Reported experiments were conducted using either fine-tuned coder LLM, Deepseek-coder-7B-instruct [6] or LLaMA-2-7B [7] as the target model depending on the task. Both training and evaluation are carried out on NVIDIA A100 40GB servers.
 
 <p align="center"><img src="cllm_speedup.png" alt="speedup" width="500"></p>
 <p align="center">Figure 4: CLLM speedup on different downstream tasks.</p>
@@ -119,12 +117,12 @@ Our experiments contains three domain-specific tasks, including Spider (text-to-
 
 **Specialized domains:** From Figure 5, we can see that in comparison with other baselines including the original target model, Medusa2, and speculative decoding, CLLMs achieve the most significant speedup.
 
-**Open-domain conversatinoal Challenge (MT-bench):** CLLM trained from LLaMA2-7B using ShareGPT dataset can achieve roughly the same speedup as Medusa2 when combined with lookahead decoding, with comparable scores on MT-bench. However, CLLM offers higher adaptability and memory efficiency as it requires no modifications to the target model's original architecture and no auxiliary components.
+**Open-domain conversational Challenge (MT-bench):** CLLM trained from LLaMA2-7B using ShareGPT dataset can achieve roughly the same speedup as Medusa2 when combined with lookahead decoding, with comparable scores on MT-bench. However, CLLM offers higher adaptability and memory efficiency as it requires no modifications to the target model's original architecture and no auxiliary components.
 
 ### Fast Forwarding and Stationary Tokens
 
 <p align="center"><img src="trajectory_compare_aligned.png" alt="compare_trajectory" width="950"></p>
-<p align="center">Figure 6: Comparison of Jacobi trajectory between a target LLM and CLLMs on Spider. Each point along the Jacobi trajectory is a color-coded sequence: blue for correct tokens matching with AR results, and red for inaccurate ones. CLLM demonstrates enhanced efficiency, converging to the fixed point $2\times$ faster the Target LLM. This increased efficiency in the CLLM can be attributed to the consistency loss which facilitates the learning of the strcture of each $n$-token sequence given a prefix.</p>
+<p align="center">Figure 6: Comparison of Jacobi trajectory between a target LLM and CLLMs on Spider. Each point along the Jacobi trajectory is a color-coded sequence: blue for correct tokens matching with AR results, and red for inaccurate ones. CLLM demonstrates enhanced efficiency, converging to the fixed point $2\times$ faster the Target LLM. This increased efficiency in the CLLM can be attributed to the consistency loss which facilitates the learning of the structure of each $n$-token sequence given a prefix.</p>
 
 The left side of Figure 6 shows target LLMs typically generate only one correct token in one iteration. In contrast, in CLLMs, we identify **fast forwarding phenomenon** where multiple consecutive tokens are correctly predicted in a single Jacobi iteration. 
 
