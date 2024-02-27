@@ -61,7 +61,7 @@ To address this, we propose adapting pre-trained LLMs so that they can consisten
 
 - **Training with consistency and AR loss:** we jointly optimize two losses for tuning CLLMs, the consistency loss guarantees the prediction of multiple tokens at once and the AR loss prevents the CLLM from deviating from the target LLM so as to maintain generation quality.
 
-<p align="center"><img src="training_objective.png" alt="objective_gif" width="700"></p>
+<p align="center"><img src="cllm_objective.png" alt="objective_gif" width="700"></p>
 <p align="center">Figure 3: an illustration of consistency training for one-step convergence: refining the target LLM to consistently predict the fixed point given any state along Jacobi trajectory as input.</p>
 
 ### Consistency and AR Loss
