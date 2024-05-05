@@ -129,16 +129,17 @@ Our experiments contain three domain-specific tasks, including Spider (text-to-S
 
 The fine-tuning cost of CLLMs is moderate, e.g., passing only around 1M tokens for LLaMA-7B to achieve a $3.4\times$ speedup on the Spider dataset. In the cases where the dataset size is large, for example, for CodeSearchNet-Python, only 10% of the dataset is required to generate Jacobi trajectories in training CLLMs to obtain around $2.5\times$ speedup. The total number of tokens can be estimated by taking:
 
-$N = $ avg # of trajectories per prompt $\times$ avg trajectory length $\times$ # of prompts.
-
 <p align="center">
-| dataset | estimated training cost (tokens) | $\%$ of pre-training cost
+$N =$ avg # of trajectories per prompt $\times$ avg trajectory length  $\times$ # of prompts.
+</p>
+
+ dataset | estimated training cost (tokens) | $\%$ of pre-training cost
 |:---:|:---:|:---:|
 | Spider | 2M | $< 0.01\%$
 | CodeSearchNet-Python | 100M | $\sim 0.1\%$
 | GSM8K | 10M | $\sim 0.01\%$
 | ShareGPT | 200M | $\sim 0.2\%$
-</p>
+
 
 
 ### Fast Forwarding and Stationary Tokens
